@@ -8,11 +8,19 @@ This repo implements the training and testing of depth upsampling networks for "
 If this codebase or our method helps your research, please cite:
 
 ` @article{Ye2021tip,
-  author = {Xinchen Ye, Xin Fan, Mingliang Zhang, Wei Zhong, Rui Xu},
-  title = {Unsupervised Monocular Depth Estimation via Recursive Stereo Distillation},
-  booktitle = {IEEE Trans. Image Processing (TIP)},
-  year={2021}, 
-  volume={0}, 
-  pages={0-0},
+   author = {Xinchen Ye, Xin Fan, Mingliang Zhang, Wei Zhong, Rui Xu},
+   title = {Unsupervised Monocular Depth Estimation via Recursive Stereo Distillation},
+   booktitle = {IEEE Trans. Image Processing (TIP)},
+   year={2021}, 
+   volume={0}, 
+   pages={0-0},
 } `
 
+
+@inproceedings{liu2018bridging,  
+  title={A Bridging Framework for Model Optimization and Deep Propagation},  
+  author={Liu, Risheng and Cheng, Shichao and Ma, Long and Fan, Xin and Luo, Zhongxuan and others},   
+  booktitle={Advances in Neural Information Processing Systems},  
+  pages={4319--4328},  
+  year={2018}  
+}
