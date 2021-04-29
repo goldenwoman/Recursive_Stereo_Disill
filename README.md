@@ -5,9 +5,9 @@ This repo implements the training and testing of depth upsampling networks for "
 This work is implemented using Tensorflow 1.0, CUDA 10.0, python 2.7.
 
 ## Train
-'''
+```
 python MS_main.py --mode=train --data_path=/data3T/KITTI/raw_data/ --filenames_file=./utils/filenames/kitti_train_files.txt --log_directory=models/ --model_name=Test_A --dataset=kitti --encoder=resASPPNet --batch_size=4 --num_epochs=50 --iter_number=2
-'''
+```
 ## Citation
 
 If this codebase or our method helps your research, please cite:
