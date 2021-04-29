@@ -12,7 +12,7 @@ python MS_main.py --mode=train --data_path=/data3T/KITTI/raw_data/ --filenames_f
 python MS_main.py --mode=train --data_path=/data3T/KITTI/raw_data/ --filenames_file=./utils/filenames/kitti_train_files.txt --log_directory=models/ --model_name=Test_A --dataset=kitti --encoder=resASPPNet --batch_size=4 --num_epochs=50 --iter_number=2
 ```
 
-We have prepared the built models for references [here](链接：https://pan.baidu.com/s/1dygNvYEmTAwStvI6q0o9mw), pwd：gt0E.
+We have prepared the testing results [here](链接：https://pan.baidu.com/s/1dygNvYEmTAwStvI6q0o9mw), pwd：gt0E.
 ## Citation
 
 If this codebase or our method helps your research, please cite:
