@@ -1,8 +1,13 @@
 # Recursive_Stereo_Disill
 This repo implements the training and testing of depth upsampling networks for "Learning Scene Structure Guidance via Cross-Task Knowledge Transfer for Single Depth Super-Resolution" by Baoli Sun, Xinchen Ye, and et al. at DLUT.
 
-## ABC_Recursive_Stereo_Disill
+## System Requirements
+This work is implemented using Tensorflow 1.0, CUDA 10.0, python 2.7.
 
+## Train
+'''
+python MS_main.py --mode=train --data_path=/data3T/KITTI/raw_data/ --filenames_file=./utils/filenames/kitti_train_files.txt --log_directory=models/ --model_name=Test_A --dataset=kitti --encoder=resASPPNet --batch_size=4 --num_epochs=50 --iter_number=2
+'''
 ## Citation
 
 If this codebase or our method helps your research, please cite:
@@ -18,49 +23,15 @@ If this codebase or our method helps your research, please cite:
 
 
 
-# lw-eg-monodepth
-This is the implementation of the paper: Light-Weight Edge-Guided Self-supervised Monocular Depth Estimation [[arXiv](https://arxiv.org/abs/1911.11705)]. This work is evolved from the project [Monodepth](https://github.com/mrharicot/monodepth). Please cite our paper if you use our results. Thanks.
-```
-@article{ kuo2019arXiv,
-    author={Kuo-Shiuan Peng and Gregory Ditzler and Jerzy Rozenblit},
-    title={ Edge-Guided Occlusion Fading Reduction for a Light-Weighted Self-Supervised Monocular Depth Estimation },
-    journal={ arXiv },
-    pages={1911.11705}, 
-    year={2019}}
-```
-
-## Main Contributions
-Our work focus on the network optimization and occlusion fading reduction using post-procssing. We introduce Atrous Spatial Pyramid Pooling (ASPP) module into DispNet to improve the performance and reduce the computational costs including paramters and inference time. The proposed Light-Weight Dispnet is shown as below
-<p align="center">
-  <img src="https://github.com/kspeng/lw-eg-monodepth/blob/master/fig/lw-eg-network.jpg" alt="lw-dispnet">
-</p>
-The proposed network is lighter, faster, and better than the conventional DispNet. 
 
 
-Furthermore, we also resolve the occlusion fading issue of self-supervision method on Depth Estimation. We proposed an Edge-Guided post-processing method involving from Godard et. al.[ref](https://github.com/mrharicot/monodepth) to produce the depth estimation results with minimal halo effects. We detect the clear edges and occlusion fading using an edge detector. Then the flip trick is used to keep the clear edges and remove the occlusion fading to yield the final result. The architecture of the proposed Edge-Guided post-processing method is shown as below:
-<p align="center">
-  <img src="https://github.com/kspeng/lw-eg-monodepth/blob/master/fig/lw-eg-post-proc.png" alt="lw-dispnet">
-</p>
 
-The performance is visualized as follows:
-<p align="center">
-  <img src="https://github.com/kspeng/lw-eg-monodepth/blob/master/fig/lw-eg-mde-demo.png" alt="lw-dispnet">
-  <img src="https://github.com/kspeng/lw-eg-monodepth/blob/master/fig/lw-eg-mde-demo-2.png" alt="lw-dispnet">    
-</p>
-The G.T. is the ground truth, pp is the prior of Godard et. al., and EG-PP is the propsoed method. Please to refer to our paper to see all the details. 
 
-## System Requirements
-This work is implemented using Tensorflow 1.5, CUDA 10.0, cuDNN 7.6, and anaconda/python 3.7 under Ubuntu 18.04LTS. There may have some warnings from Tensorflow 1.5, but it won't effect the simmulation.  
+  
 
-## Create Dataset Link
-Please download the kitti and cityscape dataset and converted the input image to JPEG format in your own path. Then create the link to local directories inside the project as following. 
-```
-mkdir dataset
-ln -s ~/path/to/kitti/ ./dataset/
-ln -s ~/path/to/cityscapes/ ./dataset/
-```
 
-## Train
+
+
 We have prepared two bash scripts to train our models on KITTI and Cityscapes dataset. After preparing the dataset, please run bash file as following (Take kitti dataset as example): 
 ```
 sh ./bash/bash_train_kitti.sh
