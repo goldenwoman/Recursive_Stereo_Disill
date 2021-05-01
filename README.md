@@ -7,7 +7,7 @@ This work is implemented using Tensorflow 1.0 and python 2.7.
   <img src="images/Color_image.gif" alt="example input output gif" width="400" />
   <img src="images/Ous_distill.gif" alt="example input output gif" width="400" />
 </p>
-#### <p align="center">Examples of input and output for our method</p>
+### <p align="center">Examples of input and output for our method</p>
 
 ## Train
 ```
