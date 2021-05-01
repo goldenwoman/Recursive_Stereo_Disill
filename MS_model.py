@@ -20,7 +20,6 @@ MSModel_parameters = namedtuple('parameters',
                         'alpha_image_loss, '
                         'disp_gradient_loss_weight, '
                         'lr_loss_weight, '
-                        'full_summary,'
                         'iter_number')
 
 class MSModel(object):
@@ -32,7 +31,6 @@ class MSModel(object):
         self.left = left
         self.right = right
         self.model_collection = ['model_' + str(model_index)]
-        # self.iter_number = iter_number
 
         self.reuse_variables = reuse_variables
         if self.mode == 'test':
@@ -41,9 +39,8 @@ class MSModel(object):
         self.build_outputs()
         if self.mode == 'test':
             return
-
         self.build_losses()
-        # self.build_summaries()
+
 
     def img_init(self, reserve_rate=0.05, reserve_rate_2=0.01):
         b = self.left.get_shape().as_list()[0]
@@ -69,31 +66,23 @@ class MSModel(object):
         gx_max, gx_min = tf.reduce_max(gx), tf.reduce_min(gx)
         return tf.sigmoid((((gx - gx_min) / ( gx_max -  gx_min))-0.5)*32)
 
-    # Get the final mono disp map
+    # Get the final stereo disp map
     def Final_disp_S(self, disp):
         l_disp = disp[0,:,:,0]
-        r_disp = tf.image.flip_left_right(disp[1,:,:,:])[:,:,0]        
-        m_disp = (l_disp + r_disp) / 2
-        # return self.r_mask * l_disp + self.l_mask * r_disp + self.m_mask * m_disp
-        ##To estimation depth for the stereo-net
+        r_disp = tf.image.flip_left_right(disp[1,:,:,:])[:,:,0]
         return self.r_mask * l_disp + self.l_mask * r_disp + self.m_mask * l_disp
 
-    # Get the final stereo disp map
+    # Get the final mono disp map
     def Final_disp_M(self, disp):
         gx = self.img_edge(disp)
-
         l_disp = disp[0,:,:,0]
         r_disp = tf.image.flip_left_right(disp[1,:,:,:])[:,:,0]
-
         l_gx = gx[0,:,:,0]
         r_gx = tf.image.flip_left_right(gx[1,:,:,:])[:,:,0]
-               
         w_gx = tf.add(l_gx, r_gx)
         l_gx = tf.truediv(l_gx, w_gx)
         r_gx = tf.truediv(r_gx, w_gx)
-        
         m_disp = l_disp * l_gx + r_disp * r_gx
-
         return self.r_mask_2 * l_disp + self.l_mask_2 * r_disp + self.m_mask_2 * m_disp
 
     def gradient_x(self, img):
@@ -571,13 +560,8 @@ class MSModel(object):
 
                 self.left_pyramid  = self.scale_pyramid(self.left,  4)
                 self.right_pyramid = self.scale_pyramid(self.right, 4)
-
-                # if self.params.do_stereo:
-                #     self.model_input = tf.concat([self.left, self.right], 3)
-                # else:
                 self.model_input = self.left
 
-                #build model
                 if self.params.encoder == 'vggNet':
                     self.build_vggNet()
                 elif self.params.encoder == 'resNet':
@@ -588,16 +572,11 @@ class MSModel(object):
                     with tf.variable_scope('resNet'):
                         self.disp1, self.disp2, self.disp3, self.disp4, \
                         self.iconv1,self.iconv2,self.iconv3,self.iconv4= self.build_resASPPNet()
-                        print('The iteration number')
-                        print(self.params.iter_number)
+                        # print('The iteration number')
+                        # print(self.params.iter_number)
 
                     with tf.variable_scope('resNet_refine'):
-                        disp_right_est = [tf.expand_dims(self.disp1[:, :, :, 1], 3)]
-                        right_est_image = [self.generate_image_right(self.left_pyramid[0], disp_right_est)]
-                        batch_size, height, width, channels = self.left_pyramid[0].get_shape().as_list()
 
-                        right_est_image = tf.reshape(right_est_image, [batch_size, height, width, channels])
-                        # model_input = tf.concat([self.left, right_est_image, disp1], 3)
                         self.output_dict = {}
                         self.output_dict['re_disp1'] = []
                         self.output_dict['re_disp2'] = []
@@ -664,9 +643,8 @@ class MSModel(object):
 
         if self.mode == 'test':
 
-            self.disp_est_pp = self.Final_disp_S(self.disp1)
-            self.disp_est = self.Final_disp_S(self.output_dict['re_disp1'][self.params.iter_number-1])
-            self.disp_est_ppp = self.Final_disp_M(self.disp1)
+            self.disp_s = self.Final_disp_S(self.output_dict['re_disp1'][self.params.iter_number-1])
+            self.disp_m = self.Final_disp_M(self.disp1)
             return
 
         with tf.variable_scope('images'):
@@ -728,7 +706,6 @@ class MSModel(object):
             #     tf.reduce_mean(tf.abs(self.softm[i] - self.resoftm[i])) for i in
             #     range(2)]
             # self.simi_dis_loss_left = tf.add_n(self.simi_dis_loss_left_temp)
-
 
             # Output Space Distillation
             self.errormap = tf.abs(self.disp_left_est[0] - tf.stop_gradient(self.refine_disp_left_est[0]))
@@ -842,9 +819,9 @@ class MSModel(object):
             # Mono-Net Loss(1)
             # self.total_loss = self.image_loss + self.params.disp_gradient_loss_weight * self.disp_gradient_loss + self.params.lr_loss_weight * self.lr_loss
             # Mono-Net Loss + Stereo-Net Loss(2)
-            self.total_loss = self.image_loss + self.params.disp_gradient_loss_weight * self.disp_gradient_loss + self.params.lr_loss_weight * self.lr_loss + self.image_loss_refine + self.params.disp_gradient_loss_weight * self.disp_gradient_loss_refine + self.params.lr_loss_weight * self.lr_loss_refine  # + self.distill_loss_left * 3 + self.perceptual_loss_left*0.1
+            self.total_loss = self.image_loss + self.params.disp_gradient_loss_weight * self.disp_gradient_loss + self.params.lr_loss_weight * self.lr_loss + self.image_loss_refine + self.params.disp_gradient_loss_weight * self.disp_gradient_loss_refine + self.params.lr_loss_weight * self.lr_loss_refine
             # Total Loss + Distillation Loss(3)
-            # self.total_loss =  self.image_loss*0.7 + self.params.disp_gradient_loss_weight * self.disp_gradient_loss + self.params.lr_loss_weight * self.lr_loss + self.image_loss_refine*0.8 + self.params.disp_gradient_loss_weight * self.disp_gradient_loss_refine + self.params.lr_loss_weight * self.lr_loss_refine+ self.distill_loss_left * 2 +self.simi_dis_loss_left*10#+ self.perceptual_loss_left*0.1
+            # self.total_loss =  self.image_loss*0.7 + self.params.disp_gradient_loss_weight * self.disp_gradient_loss + self.params.lr_loss_weight * self.lr_loss + self.image_loss_refine*0.8 + self.params.disp_gradient_loss_weight * self.disp_gradient_loss_refine + self.params.lr_loss_weight * self.lr_loss_refine+ self.distill_loss_left * 1 +self.simi_dis_loss_left*1#+ self.perceptual_loss_left*0.1
 
 
 

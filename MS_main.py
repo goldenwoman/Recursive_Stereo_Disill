@@ -1,7 +1,7 @@
 
 from __future__ import absolute_import, division, print_function
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 import numpy as np
 import argparse
@@ -11,7 +11,6 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 import scipy.misc
 import matplotlib.pyplot as plt
-# import seaborn as sns
 import cv2 as cv
 
 from MS_model import *
@@ -33,18 +32,17 @@ parser.add_argument('--num_epochs',                type=int,   help='number of e
 parser.add_argument('--learning_rate',             type=float, help='initial learning rate', default=1e-4)
 parser.add_argument('--lr_loss_weight',            type=float, help='left-right consistency weight', default=1.0)
 parser.add_argument('--alpha_image_loss',          type=float, help='weight between SSIM and L1 in the image loss', default=0.85)
-parser.add_argument('--disp_gradient_loss_weight', type=float, help='disparity smoothness weigth', default=0.5)
-parser.add_argument('--do_stereo',                             help='if set, will test on stereo dataset', action='store_true')
-parser.add_argument('--wrap_mode',                 type=str,   help='bilinear sampler wrap mode, edge or border', default='border')
-parser.add_argument('--use_deconv',                            help='if set, will use transposed convolutions', action='store_true')
-parser.add_argument('--num_gpus',                  type=int,   help='number of GPUs to use for training', default=1)
-parser.add_argument('--num_threads',               type=int,   help='number of threads to use for data loading', default=8)
-parser.add_argument('--output_directory',          type=str,   help='output directory for test disparities, if empty outputs to checkpoint folder', default='')
-parser.add_argument('--log_directory',             type=str,   help='directory to save checkpoints and summaries', default='')
-parser.add_argument('--checkpoint_path',           type=str,   help='path to a specific checkpoint to load', default='')
-parser.add_argument('--retrain',                               help='if used with checkpoint_path, will restart training from step zero', action='store_true')
-parser.add_argument('--full_summary',                          help='if set, will keep more data for each summary. Warning: the file can become very large', action='store_true')
-parser.add_argument('--iter_number', type=int, help='the iteration number for the recurrent module', default=1)
+parser.add_argument('--disp_gradient_loss_weight', type=float, help='smoothness weigth', default=0.5)
+parser.add_argument('--do_stereo',                             help='do stereo test', action='store_true')
+parser.add_argument('--wrap_mode',                 type=str,   help='bilinear sampler wrap mode', default='border')
+parser.add_argument('--use_deconv',                            help='transposed convolutions', action='store_true')
+parser.add_argument('--num_gpus',                  type=int,   help='number of GPUs', default=1)
+parser.add_argument('--num_threads',               type=int,   help='number of threads', default=8)
+parser.add_argument('--output_directory',          type=str,   help='output directory', default='')
+parser.add_argument('--log_directory',             type=str,   help='directory to save checkpoints', default='')
+parser.add_argument('--checkpoint_path',           type=str,   help='specific checkpoint path to load', default='')
+parser.add_argument('--retrain',                               help='restart training from step zero', action='store_true')
+parser.add_argument('--iter_number',               type=int,   help='the iteration number for the recurrent module', default=1)
 
 args = parser.parse_args()
 
@@ -163,7 +161,7 @@ def train(params):
 
                 summary_str = sess.run(summary_op)
                 summary_writer.add_summary(summary_str, global_step=step)
-            if step and step % 10000 == 0:
+            if step and step % 100000 == 0:
                 train_saver.save(sess, args.log_directory + '/' + args.model_name + '/model', global_step=step)
 
         train_saver.save(sess, args.log_directory + '/' + args.model_name + '/model', global_step=num_total_steps)
@@ -200,47 +198,19 @@ def test(params):
     num_test_samples = count_text_lines(args.filenames_file)
 
     print('now testing {} files'.format(num_test_samples))
-    disparities     = np.zeros((num_test_samples, params.height, params.width), dtype=np.float32)
-    disparities_pp  = np.zeros((num_test_samples, params.height, params.width), dtype=np.float32)
-    disparities_ppp = np.zeros((num_test_samples, params.height, params.width), dtype=np.float32)    
+    disparities_m     = np.zeros((num_test_samples, params.height, params.width), dtype=np.float32)
+    disparities_s  = np.zeros((num_test_samples, params.height, params.width), dtype=np.float32)
     comp_tower  = []
     comp_offset = 10
     for step in range(num_test_samples):
         st = time.time()
-        disp, disp_pp, disp_ppp,outtest = sess.run([model.disp_est, model.disp_est_pp, model.disp_est_ppp,model.out])
-        if step==74:
-            disp_to_img = scipy.misc.imresize(disp, [375, 1242])
-            output_d = os.path.dirname(args.output_directory)
-            plt.imsave(os.path.join(output_d, "{}_disp.png".format(step)), disp_to_img, cmap='plasma')
-            disp_to_img_pp = scipy.misc.imresize(disp_ppp, [375, 1242])
-            plt.imsave(os.path.join(output_d, "{}_disp_pp.png".format(step)), disp_to_img_pp, cmap='plasma')
-            print('=============done!!!!')
-        # print('=====ok')
-        # print(disp.shape)
-        output_d = os.path.dirname(args.output_directory)
-        # disp_to_img_pp = scipy.misc.imresize(disp_pp, [375, 1242])
-        # plt.imsave(os.path.join(output_d, "{}_disp.png".format(step)), disp_to_img_pp, cmap='plasma')
+        disp_m, disp_s = sess.run([model.disp_m, model.disp_s])
 
-        # ##disparities[step] = disp
-        #
-        # disp_to_img = scipy.misc.imresize(disp, [375, 1242])
-        # # aa = disparities_pp[step]
-        # #####################################
-        # outtest22 = outtest[0:10,0:10]
-        # output_d = os.path.dirname(args.output_directory)
-        # sns.heatmap(outtest22, linewidths=0.05,  cmap='rainbow')
-        # plt.savefig(os.path.join(output_d, "{}_disp_pp111.png".format(step)))
-        # plt.imsave(os.path.join(output_d, "{}_disp_pp.png".format(step)), outtest, cmap='plasma')
-        # #####################################
-        # plt.imsave(os.path.join(output_d, "{}_disp.png".format(step)), disp_to_img, cmap='plasma')
-        #
-        # disp_to_img_pp = scipy.misc.imresize(disp_ppp, [375, 1242])
-        # plt.imsave(os.path.join(output_d, "{}_disp_pp.png".format(step)), disp_to_img_pp, cmap='plasma')
         if step >= comp_offset:
             comp_tower += time.time() - st,
-        disparities[step]       = disp
-        disparities_pp[step]    = disp_pp
-        disparities_ppp[step]   = disp_ppp
+
+        disparities_m[step]    = disp_m
+        disparities_s[step]   = disp_s
     total_time = sum(comp_tower)
 
     print('done.')
@@ -253,9 +223,9 @@ def test(params):
     else:
         output_directory = args.output_directory
 
-    np.save(output_directory + '/disparities.npy',    disparities)
-    np.save(output_directory + '/disparities_pp.npy', disparities_pp)
-    np.save(output_directory + '/disparities_ppp.npy', disparities_ppp)
+
+    np.save(output_directory + '/disparities_m.npy', disparities_m)
+    np.save(output_directory + '/disparities_s.npy', disparities_s)
 
     print('done.')
 
@@ -274,7 +244,6 @@ def main(_):
         alpha_image_loss=args.alpha_image_loss,
         disp_gradient_loss_weight=args.disp_gradient_loss_weight,
         lr_loss_weight=args.lr_loss_weight,
-        full_summary=args.full_summary,
         iter_number=args.iter_number)
 
     if args.mode == 'train':

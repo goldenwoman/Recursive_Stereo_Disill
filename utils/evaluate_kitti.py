@@ -24,28 +24,6 @@ if __name__ == '__main__':
         gt_disparities = load_gt_disp_kitti(args.gt_path)
         gt_depths, pred_depths, pred_disparities_resized = convert_disps_to_depths_kitti(gt_disparities, pred_disparities)
 
-    # elif args.split == 'eigen':
-    #     num_samples = 697
-    #     test_files = read_text_lines(args.gt_path + 'eigen_test_files.txt')
-    #     gt_files, gt_calib, im_sizes, im_files, cams = read_file_data(test_files, args.gt_path)
-    #
-    #     num_test = len(im_files)
-    #     gt_depths = []
-    #     pred_depths = []
-    #     for t_id in range(num_samples):
-    #         camera_id = cams[t_id]
-    #         depth = generate_depth_map(gt_calib[t_id], gt_files[t_id], im_sizes[t_id], camera_id, False, True)
-    #         gt_depths.append(depth.astype(np.float32))
-    #
-    #         disp_pred = cv2.resize(pred_disparities[t_id], (im_sizes[t_id][1], im_sizes[t_id][0]), interpolation=cv2.INTER_LINEAR)
-    #         disp_pred = disp_pred * disp_pred.shape[1]
-    #
-    #         focal_length, baseline = get_focal_length_baseline(gt_calib[t_id], camera_id)
-    #         depth_pred = (baseline * focal_length) / disp_pred
-    #         depth_pred[np.isinf(depth_pred)] = 0
-    #
-    #         pred_depths.append(depth_pred)
-
     rms     = np.zeros(num_samples, np.float32)
     log_rms = np.zeros(num_samples, np.float32)
     abs_rel = np.zeros(num_samples, np.float32)
@@ -62,26 +40,6 @@ if __name__ == '__main__':
 
         pred_depth[pred_depth < args.min_depth] = args.min_depth
         pred_depth[pred_depth > args.max_depth] = args.max_depth
-
-        # if args.split == 'eigen':
-        #     mask = np.logical_and(gt_depth > args.min_depth, gt_depth < args.max_depth)
-        #
-        #
-        #     if args.garg_crop or args.eigen_crop:
-        #         gt_height, gt_width = gt_depth.shape
-        #
-        #
-        #         if args.garg_crop:
-        #             crop = np.array([0.40810811 * gt_height,  0.99189189 * gt_height,
-        #                              0.03594771 * gt_width,   0.96405229 * gt_width]).astype(np.int32)
-        #
-        #         elif args.eigen_crop:
-        #             crop = np.array([0.3324324 * gt_height,  0.91351351 * gt_height,
-        #                              0.0359477 * gt_width,   0.96405229 * gt_width]).astype(np.int32)
-        #
-        #         crop_mask = np.zeros(mask.shape)
-        #         crop_mask[crop[0]:crop[1],crop[2]:crop[3]] = 1
-        #         mask = np.logical_and(mask, crop_mask)
 
         if args.split == 'kitti':
             gt_disp = gt_disparities[i]

@@ -19,12 +19,6 @@ if __name__ == '__main__':
 
     pred_disparities = np.load(args.predicted_disp_path)
 
-    # if args.split == 'kitti':
-    #     num_samples = 200
-    #
-    #     gt_disparities = load_gt_disp_kitti(args.gt_path)
-    #     gt_depths, pred_depths, pred_disparities_resized = convert_disps_to_depths_kitti(gt_disparities, pred_disparities)
-
     if args.split == 'eigen':
         num_samples = 697
         test_files = read_text_lines('./utils/filenames/eigen_test_files.txt')
@@ -84,14 +78,6 @@ if __name__ == '__main__':
                 crop_mask[crop[0]:crop[1],crop[2]:crop[3]] = 1
                 mask = np.logical_and(mask, crop_mask)
 
-        # if args.split == 'kitti':
-        #     gt_disp = gt_disparities[i]
-        #     mask = gt_disp > 0
-        #     pred_disp = pred_disparities_resized[i]
-        #
-        #     disp_diff = np.abs(gt_disp[mask] - pred_disp[mask])
-        #     bad_pixels = np.logical_and(disp_diff >= 3, (disp_diff / gt_disp[mask]) >= 0.05)
-        #     d1_all[i] = 100.0 * bad_pixels.sum() / mask.sum()
 
         abs_rel[i], sq_rel[i], rms[i], log_rms[i], a1[i], a2[i], a3[i] = compute_errors(gt_depth[mask], pred_depth[mask])
     print("{:>10}, {:>10}, {:>10}, {:>10}, {:>10}, {:>10}, {:>10}, {:>10}".format('abs_rel', 'sq_rel', 'rms', 'log_rms', 'd1_all', 'a1', 'a2', 'a3'))
