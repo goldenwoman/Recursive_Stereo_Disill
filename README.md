@@ -10,6 +10,8 @@ This work is implemented using Tensorflow 1.0 and python 2.7.
   <img src="images/Color_image.gif" alt="example input output gif" width="500" />
   <img src="images/Ous_distill.gif" alt="example input output gif" width="500" />
 </p>
+![Example](images/Ous_distill.gif)
+
 ## Train
 ```
 python MS_main.py --mode=train --data_path=raw_data_path --filenames_file=./utils/filenames/kitti_train_files.txt --log_directory=models/ --model_name=Test_A --dataset=kitti --encoder=resASPPNet --batch_size=4 --num_epochs=50 --iter_number=2
