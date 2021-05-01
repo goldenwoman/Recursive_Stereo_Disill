@@ -4,8 +4,8 @@ Unsupervised Monocular Depth Estimation via Recursive Stereo Distillation(https:
 This work is implemented using Tensorflow 1.0 and python 2.7.
 
 <p align="center">
-  <img src="images/Color_image.gif" alt="example input output gif" width="600" />
-  <img src="images/Color_image.gif" alt="example input output gif" width="600" />
+  <img src="images/Color_image.gif" alt="example input output gif" width="500" />
+  <img src="images/Ous_distill.gif" alt="example input output gif" width="500" />
 </p>
 
 ## Train
