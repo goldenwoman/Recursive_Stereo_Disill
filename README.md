@@ -3,13 +3,17 @@ Unsupervised Monocular Depth Estimation via Recursive Stereo Distillation(https:
 ## Requirements
 This work is implemented using Tensorflow 1.0 and python 2.7.
 
+<p align="center">
+  <img src="assets/teaser.gif" alt="example input output gif" width="600" />
+</p>
+
 ## Train
 ```
-python MS_main.py --mode=train --data_path=/data3T/KITTI/raw_data/ --filenames_file=./utils/filenames/kitti_train_files.txt --log_directory=models/ --model_name=Test_A --dataset=kitti --encoder=resASPPNet --batch_size=4 --num_epochs=50 --iter_number=2
+python MS_main.py --mode=train --data_path=raw_data_path --filenames_file=./utils/filenames/kitti_train_files.txt --log_directory=models/ --model_name=Test_A --dataset=kitti --encoder=resASPPNet --batch_size=4 --num_epochs=50 --iter_number=2
 ```
 ## Test
 ```
-python MS_main.py --mode=train --data_path=/data3T/KITTI/raw_data/ --filenames_file=./utils/filenames/kitti_train_files.txt --log_directory=models/ --model_name=Test_A --dataset=kitti --encoder=resASPPNet --batch_size=4 --num_epochs=50 --iter_number=2
+python MS_main.py --mode=test --data_path=raw_data_path --filenames_file=./utils/filenames/eigen_test_files.txt --dataset=kitti --encoder=resASPPNet --checkpoint_path=Trained model --output_directory=./models/Test_A/ --iter_number=2 --do_stereo
 ```
 
 We have prepared the testing results [here](https://pan.baidu.com/s/1dygNvYEmTAwStvI6q0o9mw), pwd：gt0E.
