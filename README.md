@@ -14,6 +14,10 @@ This work is implemented using Tensorflow 1.0 and python 2.7.
   <img src="images/framework.png" alt="frameworkpng" width="800" />
 </p>
 <p align="center">Network overview</p>
+<p align="center">
+  <img src="images/fdetails.png" alt="fdetails" width="800" />
+</p>
+<p align="center">The detail structures of Mono-Net and Stereo-Net</p>
 
 ## Train
 ```
