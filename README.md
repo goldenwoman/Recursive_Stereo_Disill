@@ -11,7 +11,7 @@ This work is implemented using Tensorflow 1.0 and python 2.7.
 
 ## Method
 <p align="center">
-  <img src="images/framework.png" alt="frameworkpng" width="400" />
+  <img src="images/framework.png" alt="frameworkpng" width="800" />
 </p>
 <p align="center">Network overview</p>
 
