@@ -223,9 +223,10 @@ def test(params):
     else:
         output_directory = args.output_directory
 
-
-    np.save(output_directory + '/disparities_m.npy', disparities_m)
-    np.save(output_directory + '/disparities_s.npy', disparities_s)
+    if args.do_stereo == True:
+        np.save(output_directory + '/disparities_s.npy', disparities_s)
+    else:
+        np.save(output_directory + '/disparities_m.npy', disparities_m)
 
     print('done.')
 

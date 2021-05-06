@@ -22,10 +22,8 @@ class MSDataloader(object):
         split_line = tf.string_split([line]).values
 
 
-        if mode == 'test' and not self.params.do_stereo:
-            left_image_path  = tf.string_join([self.data_path, split_line[0]])
-            left_image_o  = self.read_image(left_image_path)
-        else:
+        if mode == 'test':
+
             left_image_path  = tf.string_join([self.data_path, split_line[0]])
             right_image_path = tf.string_join([self.data_path, split_line[1]])
             left_image_o  = self.read_image(left_image_path)
@@ -50,10 +48,13 @@ class MSDataloader(object):
 
         elif mode == 'test':
             self.left_image_batch = tf.stack([left_image_o,  tf.image.flip_left_right(left_image_o)],  0)
+            self.right_image_batch = tf.stack([right_image_o, tf.image.flip_left_right(right_image_o)], 0)
+
             self.left_image_batch.set_shape( [2, None, None, 3])
+            self.right_image_batch.set_shape([2, None, None, 3])
 
             if self.params.do_stereo:
-                self.right_image_batch = tf.stack([right_image_o, tf.image.flip_left_right(right_image_o)], 0)
+
                 self.right_image_batch = tf.stack([right_image_o,  tf.image.flip_left_right(left_image_o)],  0)
                 self.left_image_batch = tf.stack([left_image_o, tf.image.flip_left_right(right_image_o)], 0)
                 self.left_image_batch.set_shape([2, None, None, 3])
