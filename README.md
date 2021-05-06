@@ -26,8 +26,9 @@ python MS_main.py --mode=train --data_path=raw_data_path --filenames_file=./util
 ```
 ## Test
 ```
-python MS_main.py --mode=test --data_path=raw_data_path --filenames_file=./utils/filenames/eigen_test_files.txt --dataset=kitti --encoder=resASPPNet --checkpoint_path=Trained model --output_directory=./models/Test_A/ --iter_number=2 --do_stereo
+python MS_main.py --mode=test --data_path=raw_data_path --filenames_file=./utils/filenames/eigen_test_files.txt --dataset=kitti --encoder=resASPPNet --checkpoint_path=Trained model --output_directory=./models/Test_A/ --iter_number=2 
 ```
+Here the option ```--do_stereo``` is used for stereo test.
 ```
 python utils/evaluate_eigen.py --split=eigen --gt_path=raw_data_path --max_depth=80 --garg_crop --predicted_disp_path=predicted npy files for disp
 ```
