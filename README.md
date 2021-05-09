@@ -42,8 +42,8 @@ If this codebase or our method helps your research, please cite:
    title = {Unsupervised Monocular Depth Estimation via Recursive Stereo Distillation},
    booktitle = {IEEE Trans. Image Processing (TIP)},
    year={2021}, 
-   volume={0}, 
-   pages={0-0}}
+   volume={30}, 
+   pages={4492-4504}}
 ```
 
 
